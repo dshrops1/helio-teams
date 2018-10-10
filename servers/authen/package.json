@@ -1,0 +1,17 @@
+{
+  "name": "authen",
+  "version": "1.0.0",
+  "description": "sql authen server ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dustin Shropshire",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^6.1.0",
+    "express": "^4.16.3",
+    "monk": "^6.0.6",
+    "mysql": "github:mysqljs/mysql"
+  }
+}
