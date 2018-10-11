@@ -6,7 +6,29 @@
 
   </head>
   <body>
+    <!--
+    So using no frame work we are going to build our own module based spa
+    using div tags that we inject our dynamically created html into
+    and then we will hide or show those divs if they are supposed to be there
+  -->
+  <!--in fact we should have a createNewComponent method that creates our div
+    then we will have a render method where we inject all needed code
+    so maybe pass an object or string with all the html
+    maybe the render takes a string and just sets the inner html
+  >
 
+  </div>  -->
+  <div id="login-page">
+    <!--now generate these in javascript kind of like a component render in react -->
+    <p>login-page</p>
+    <button id="login-button">login</button>
+  </div>
 
+  <div id="main-chat-server" hidden>
+    <p>main-chat-server</p>
+    <button id="logout-button">logout</button>
+  </div>
+
+<script src="./index.js"></script>
   </body>
 </html>
