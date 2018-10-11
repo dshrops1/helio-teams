@@ -4,11 +4,12 @@
   "description": "vue based teams tool",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
   },
   "author": "Dustin Shropshire",
   "license": "ISC",
   "dependencies": {
-    "electron": "^3.0.3"
+    "electron": "^3.0.3",
   }
 }
