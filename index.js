@@ -1,36 +1,20 @@
 let comps = require("./componetBuilder");
+let login = require("./components/login.js").login
+let webServer = require("./components/main-webserver.js").webServer
+
+
+/*
+* Build out your compoents with componetBuilder
+* bring them into an index.js to modify them and update so all other logic is done here
+*/
 
 
 
-
-let myCompoent2 = new comps.Builder(`
-  <div id="login-page">
-    <!--now generate these in javascript kind of like a component render in react -->
-    <p>login-page</p>
-    <button id="login-button">login</button>
-  </div>
-
-  `, "login")
-
-  let testComp = new comps.Builder(`
-      <p>testing</p>
-    `)
-
-    
-  let loginComp = new comps.Builder(`
-      <p>main-chat-server</p>
-      <button id="logout-button">logout</button>
-      ${testComp.build()}
-  ` , 'main-chat-server');
+  
+  login.build(true);
+  webServer.build(true,true)
 
 
-
-
-  myCompoent2.build(true);
-  //maybe have a second arg to make it hidden to start
-  loginComp.build(true,true)
-
-
-  myCompoent2.addHandler(true, "login-button", "click",function(){myCompoent2.hide(); loginComp.show() });
-
-  loginComp.addHandler(true, "logout-button","click", function(){myCompoent2.show(); loginComp.hide();})
+  //this could be tedious not being able to add eventListeners until after its added to document
+  login.addHandler(true, "login-button", "click",function(){login.hide(); webServer.show() });
+  webServer.addHandler(true, "logout-button","click", function(){login.show(); webServer.hide();})
