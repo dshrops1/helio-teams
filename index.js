@@ -1,24 +1,36 @@
 let comps = require("./componetBuilder");
 
-let myComponent = new comps.Builder(`<p>test</p>`);
+
 
 
 let myCompoent2 = new comps.Builder(`
-    <p>pre testing</p>
-    ${myComponent.build()}
+  <div id="login-page">
+    <!--now generate these in javascript kind of like a component render in react -->
+    <p>login-page</p>
+    <button id="login-button">login</button>
+  </div>
 
-  `)
+  `, "login")
 
-  myCompoent2.build(true)
-  console.log(myCompoent2)
+  let testComp = new comps.Builder(`
+      <p>testing</p>
+    `)
 
-document.getElementById('login-button').onclick = function(){
+    
+  let loginComp = new comps.Builder(`
+      <p>main-chat-server</p>
+      <button id="logout-button">logout</button>
+      ${testComp.build()}
+  ` , 'main-chat-server');
 
-    document.getElementById('login-page').setAttribute("hidden",true)
-    document.getElementById('main-chat-server').removeAttribute("hidden")
-}
 
-document.getElementById('logout-button').onclick = function(){
-  document.getElementById("main-chat-server").setAttribute("hidden",true)
-  document.getElementById("login-page").removeAttribute("hidden")
-}
+
+
+  myCompoent2.build(true);
+  //maybe have a second arg to make it hidden to start
+  loginComp.build(true,true)
+
+
+  myCompoent2.addHandler(true, "login-button", "click",function(){myCompoent2.hide(); loginComp.show() });
+
+  loginComp.addHandler(true, "logout-button","click", function(){myCompoent2.show(); loginComp.hide();})
