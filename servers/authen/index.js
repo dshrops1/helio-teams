@@ -19,9 +19,8 @@ bcrypt.genSalt(saltRounds, function(err, salt) {
     });
 });
 
-
-
-const monk = require('monk')
+//updated git global
+st monk = require('monk')
 
 // Connection URL
 // const url = `${process.env.USERF}:${process.env.PASS}@${process.env.CONNECTION}`;
