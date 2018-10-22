@@ -29,8 +29,11 @@
          return this.html;
       }
     },
-
-    this.hide = function(){document.getElementById(this.id).setAttribute("hidden",true)},
+    //using flex box you would need addiotnal css of [hidde]{display: none !important}
+    this.hide = function(){
+      document.getElementById(this.id).setAttribute("hidden",true)
+      document.getElementById(this.id).setAttribute("style", "display: none !important")
+    },
 
     //change this so that we decide if we are going to use an id or number to search for the ele
     this.addHandler = function(searchByid = true, elementToSearchFor, functionType, functionToAdd, elementChoice){
@@ -54,6 +57,9 @@
     this.show = function(){
 
         document.getElementById(this.id).removeAttribute("hidden");
+        //we may want users to be able to do inline styling later on
+        //thus we will need to grab that and only remove the display
+        document.getElementById(this.id).removeAttribute("style");
     }
 
 

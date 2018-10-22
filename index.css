@@ -2,10 +2,38 @@
 for module based css maybe do something like .class > * or however
 maybe have a comment above each section for each module ..will decide later
 */
-body{
-  background-color: gray;
+html, body {
+    height: 100%;
+    background-color: #3e3e3e;
 }
 
-button {
+input{
+
+  color: #ffd007;
+  border-color: #ffd007;
   background-color: gray;
+
+}
+
+/* [hidden]{
+  display: none !important;
+} */
+
+[type="submit"]:hover {
+  background-color: rgba(246,243,33, .4);
+}
+
+#login {
+  height: 100%;
+  /* padding: 0; */
+  /* margin: 0; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+}
+
+#login > * {
+  padding: 1em;
 }

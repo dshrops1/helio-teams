@@ -16,9 +16,13 @@ let webServer = require("./components/main-webserver.js").webServer
 
 
   login.build(true);
-  webServer.build(true,true)
+
 
 
   //this could be tedious not being able to add eventListeners until after its added to document
-  login.addHandler(true, "login-button", "click",function(){login.hide(); webServer.show() });
-  webServer.addHandler(true, "logout-button","click", function(){login.show(); webServer.hide();})
+  //do a fetch request to our api to check if authorized
+  login.addHandler(true, "login-button", "click",function(e){
+    login.hide();
+    e.preventDefault();
+    console.log("test") 
+  });

@@ -1,18 +1,41 @@
 require('dotenv').config();
+const bcrypt = require('bcrypt')
+const saltRounds = 10
+
+const testPassword = "Dustbunny1992!"
+const testUser = "dshrops1"
+let hashedPass = ''
+
+bcrypt.genSalt(saltRounds, function(err, salt) {
+    bcrypt.hash(testPassword, salt, function(err, hash) {
+        // Store hash in your password DB.
+        console.log(hash)
+
+        bcrypt.compare(testPassword, hash).then(function(res) {
+    // res == true
+    console.log(res)
+});
+
+    });
+});
+
+
 
 const monk = require('monk')
 
 // Connection URL
-const url = `${process.env.USER}:${process.env.PASS}@${process.env.CONNECTION}`;
-const db = monk(url, {authSource: "admin"});
-db.then(() => {
-  console.log('Connected correctly to server')
-})
+// const url = `${process.env.USERF}:${process.env.PASS}@${process.env.CONNECTION}`;
+// const db = monk(url, {authSource: "admin"});
+// db.then(() => {
+//   console.log('Connected correctly to server')
+// })
+//
+// const collection = db.get("user_collection")
+//
+// collection.insert({})
 
-const collection = db.get("user_collection")
 
-//test working on test data
-collection.findOne({id: 1}).then((doc)=>console.log(doc));
+//we need to set up express and body parser
 
-
-//will need to add express in here for authentication
+//add user route
+//authenticate user
