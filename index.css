@@ -7,6 +7,10 @@ html, body {
     background-color: #3e3e3e;
 }
 
+a {
+  color: white;
+}
+
 input{
 
   color: #ffd007;

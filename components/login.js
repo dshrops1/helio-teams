@@ -11,7 +11,9 @@ let myCompoent2 = new comps.Builder(`
       <input type="email" />
       <input type="password" />
       <input id="login-button" type="submit" />
-    </form
+    </form>
+    <a href="#">reset password</a>
+    <a href="#">sign up</a>
 
 
   `, "login")
