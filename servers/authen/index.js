@@ -1,15 +1,16 @@
 require('dotenv').config();
+const bcrypt = require('bcrypt');
 const express = require("express")
 const app = express()
-const port = 3000;
 const bodyParser = require('body-parser')
 const monk = require('monk')
 
 //an array of objects containing the active email link to webpages that we will serve with users
-//atached as well as maybe a life time for resetting password
 let activeEmailLinks = []
+const port = 3000;
+const saltRounds = 10;
 
-//Connection URL
+//database connection
 const url = `${process.env.USERF}:${process.env.PASS}@${process.env.CONNECTION}${process.env.DATABASE}`;
 const db = monk(url, {authSource: "admin"});
 db.then(() => {
@@ -17,13 +18,19 @@ db.then(() => {
 })
 const collection = db.get(process.env.COLLECTION);
 
-
-//we need to set up express and body parser
-
-//routes
-//add user route
-//authenticate user
 //reset password
+
+function encryptPassword(password){
+
+  bcrypt.genSalt(saltRounds, function(err, salt) {
+    bcrypt.hash(password, salt, function(err, hash) {
+
+        return hash;
+    });
+});
+
+}
+
 
 
 //may not need this header but godforbid we have to deal with cors
@@ -32,6 +39,9 @@ app.use(function(req, res, next) {
     next();
 });
 
+/*
+* middleware to make sure this connection is authroized
+*/
 app.use(function(req,res,next){
 
   let auth = req.headers.authorization.split(" ")
@@ -53,27 +63,58 @@ app.use(bodyParser.json())
 
 
 //createUser
-app.post('/', async function(req,res){
+app.post('/createUser', async function(req,res){
     let body = await req.body
-    //steps
-    //1) grab all items needed from the req object to create our database object to insert
+
     let objectForDatabase = {
       "Email": body.Email,
       "Password": body.Password,
-      "Authorized": body.Authorized,
+      "Authorized": encryptPassword(body.Authorized),
       "Role": body.Role
     }
 
+    //make sure right stuff was sent
     let test = true;
     let objectValues = Object.values(objectForDatabase)
     objectValues.forEach(x => {
+      //right now we are just checking for undefined but later we will have a function check for right content
       if(x === undefined){ res.send("please proper body"); test = false }
     })
 
     console.log(objectForDatabase);
-    //2) if all items are there insert into DATABASE if not return error
-    //3) if done return sucess responce
-    if(test) res.send(objectForDatabase)
+
+    if(test){
+      collection.insert(objectForDatabase)
+      res.send(true)
+    };
+    test = true;
+
+})
+
+//route for checking if a users credentials are authroized
+//so we will pass the form data and check against DATABASE
+app.post("/authorizeUser", async function(req,res){
+      //we can prob refact to keep DRY and have this be part of the middleware
+      let body = await req.body
+      let exsists = false;
+      let userItem;
+      //check that email exsists then grab password and compare bcrypt hash send to one in database
+      //if null then does no exsist
+      await collection.findOne({Email: body.Email}).then(res=>{
+        //console.log(res)
+        if(res !== null) exsists = true;
+        userItem = res;
+      })
+
+      if(exsists){
+
+          //check database password to one sent with bycrypt compare
+
+      }
+
+      console.log(userItem)
+      exsists = false
+      res.send(true)
 
 })
 
