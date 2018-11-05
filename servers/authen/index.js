@@ -73,22 +73,27 @@ app.post('/createUser', async function(req,res){
       "Role": body.Role
     }
 
-    //make sure right stuff was sent
-    let test = true;
-    let objectValues = Object.values(objectForDatabase)
-    objectValues.forEach(x => {
-      //right now we are just checking for undefined but later we will have a function check for right content
-      if(x === undefined){ res.send("please proper body"); test = false }
+    console.log(objectForDatabase);
+    let properData;
+
+    //for now we will just make sure that values are not undefined and later on we will
+    //update for more advanced checking
+  properData =  Object.values(objectForDatabase).reduce(function(accum, curr){
+
+            if(curr != undefined){
+
+              accum = true;
+            }else{
+              accum = false;
+            }
+
     })
 
-    console.log(objectForDatabase);
 
-    if(test){
+    if(properData){
       collection.insert(objectForDatabase)
       res.send(true)
     };
-    test = true;
-
 })
 
 //route for checking if a users credentials are authroized
@@ -98,6 +103,8 @@ app.post("/authorizeUser", async function(req,res){
       let body = await req.body
       let exsists = false;
       let userItem;
+      let matched = false;
+      let responceObject = res
       //check that email exsists then grab password and compare bcrypt hash send to one in database
       //if null then does no exsist
       await collection.findOne({Email: body.Email}).then(res=>{
@@ -108,13 +115,27 @@ app.post("/authorizeUser", async function(req,res){
 
       if(exsists){
 
-          //check database password to one sent with bycrypt compare
+      let matched = await bcrypt.compare(body.Password, userItem.Password)
 
+        if(matched){
+
+          res.send(matched)
+
+        }else {
+
+          res.send(!matched)
+        }
+
+      }else{
+
+        res.send(false)
       }
 
-      console.log(userItem)
-      exsists = false
-      res.send(true)
+
+})
+
+
+app.post("/updatePassword", function(req, res){
 
 })
 
