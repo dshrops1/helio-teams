@@ -1,7 +1,7 @@
 let comps = require("./componetBuilder");
 let login = require("./components/login.js").login
 let webServer = require("./components/main-webserver.js").webServer
-
+require('dotenv').config()
 
 /*
 * Build out your compoents with componetBuilder
@@ -12,17 +12,50 @@ let webServer = require("./components/main-webserver.js").webServer
 * and instead are worried about how they change.
 */
 
-
-
-
   login.build(true);
-
-
 
   //this could be tedious not being able to add eventListeners until after its added to document
   //do a fetch request to our api to check if authorized
-  login.addHandler(true, "login-button", "click",function(e){
-    login.hide();
-    e.preventDefault();
-    console.log("test") 
+  login.addHandler(true, "login-button", "click",  function(e){
+        let responceTest;
+        //let event = e
+        //let loginValues = document.getElementById("login-form")
+
+        //let user = loginValues.elements[0].value
+
+        //let pass = loginValues.elements[1].value
+
+        //  fetch("http://localhost:3000/authorizeUser", {
+        //   method: "POST",
+        //   headers: {
+        //       "Content-Type": "application/json",
+        //       "Authorization": `Basic ${process.env.USERF}:${process.env.PASSWORD}`
+        //   },
+        //   body: JSON.stringify({
+        //     Email: user,
+        //     Password: pass
+        //   })
+        // }).then(function(res){
+        //
+        //   return res.json()
+        //
+        //
+        //
+        // }).then(function(json){
+        //
+        //     if(json){
+        //
+        //       login.hide()
+        //
+        //     }
+        //
+        //
+        // })
+
+
+
+
+     login.hide();
+     e.preventDefault();
+     console.log("test")
   });

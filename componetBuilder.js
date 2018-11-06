@@ -4,7 +4,6 @@
 * ComponetBuilder is a simple module builder used for specifying how an html page should be build
 * as well as how it should change in responce to events.
 */
-
  function Builder(html,id){
 
     this.html = html,
@@ -38,7 +37,6 @@
     //change this so that we decide if we are going to use an id or number to search for the ele
     this.addHandler = function(searchByid = true, elementToSearchFor, functionType, functionToAdd, elementChoice){
 
-
           if(searchByid){
 
               let ele = document.getElementById(elementToSearchFor)
@@ -52,7 +50,6 @@
 
             elementChoices[elementChoice].addEventListener(functionType, functionToAdd);
         }
-
     },
     this.show = function(){
 
@@ -61,7 +58,6 @@
         //thus we will need to grab that and only remove the display
         document.getElementById(this.id).removeAttribute("style");
     }
-
 
 }
 
