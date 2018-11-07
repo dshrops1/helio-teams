@@ -1,3 +1,8 @@
+/*
+* Authors: Dustin shrosphire
+* Notes:
+*/
+
 let comps = require("../componetBuilder");
 
 let testComp = new comps.Builder(`

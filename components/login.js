@@ -1,3 +1,9 @@
+/*
+* Authors: Dustin shrosphire
+* Notes: should our anchor tags link go to default browser web page hosted else where
+* or should we have a pop up window that when submited just closes?
+*/
+
 let comps = require("../componetBuilder");
 
 let myCompoent2 = new comps.Builder(`

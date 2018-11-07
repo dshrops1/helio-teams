@@ -8,6 +8,7 @@
 
     this.html = html,
     this.id = id,
+    //because add to document is an argument we need a way to add later if false
     this.build = function(addToDocument,hideToStart=false){
       //if arg is passed as true we create and append to body
       if(addToDocument){
