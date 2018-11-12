@@ -1,6 +1,6 @@
 /*
 * Authors: Dustin shrosphire
-* Notes: 
+* Notes:
 */
 
 require('dotenv').config();
@@ -107,6 +107,7 @@ app.post("/authorizeUser", async function(req,res){
       if(exsists){
 
         let matched = await bcrypt.compare(body.Password, userItem.Password)
+        //should also check here that the user authorization field is true making them an active user
         if(matched){
           res.send(matched)
         }else {
@@ -120,5 +121,7 @@ app.post("/authorizeUser", async function(req,res){
 app.post("/updatePassword", function(req, res){
 
 })
+
+//user exsists route for reseting password
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))

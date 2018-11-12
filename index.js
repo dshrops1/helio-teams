@@ -3,6 +3,10 @@ let login = require("./components/login.js").login
 let webServer = require("./components/main-webserver.js").webServer
 require('dotenv').config()
 
+const {dialog} = require('electron').remote
+const dialogOptions = {type: 'info', buttons: ['OK', 'Cancel'], message: 'YOU SHALL NOT PASS!...without the right credentials.?'}
+//dialog.showMessageBox(dialogOptions, i => console.log(i))
+
 /*
 * Build out your compoents with componetBuilder
 * bring them into an index.js to modify them and update so all other logic is done here
@@ -44,7 +48,8 @@ login.addHandler(true, "login-button", "click",  function(e){
             }else{
               //for the icon maybe look at browserwindows options for icon and see how
               //that affects pop ups as well as other windows
-              alert("YOU SHALL NOT PASS!...without the right credentials.")
+              //alert("YOU SHALL NOT PASS!...without the right credentials.")
+              dialog.showMessageBox(dialogOptions, i => console.log(i))
             }
             //maybe if it doesnt match we will provide alert saying no match was found?
 
@@ -53,6 +58,12 @@ login.addHandler(true, "login-button", "click",  function(e){
 
      e.preventDefault();
   });
+login.addHandler(true, "resetPassword", "click", function(e){
+  alert('works')
+});
+login.addHandler(true, "signUp", "click", function(e){
+  alert("workds")
+})
 //this could be tedious not being able to add eventListeners until after its added to document
 //do a fetch request to our api to check if authorized
 
