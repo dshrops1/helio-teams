@@ -1,6 +1,8 @@
 let comps = require("./componetBuilder");
 let login = require("./components/login.js").login
 let webServer = require("./components/main-webserver.js").webServer
+let resetPassword = require("./components/resetPassword.js").resetPassword;
+
 require('dotenv').config()
 
 const {dialog} = require('electron').remote
@@ -17,34 +19,47 @@ const dialogOptions = {type: 'info', buttons: ['OK', 'Cancel'], message: 'YOU SH
 */
 
 //COMPONENTS
-login.build(true);
-webServer.build(true,true)
+login.build();
+webServer.build();
+resetPassword.build();
+
+login.addToDocument()
 
 //HANDLERS
 login.addHandler(true, "login-button", "click",  function(e){
         let loginValues = document.getElementById("login-form")
-        let user = loginValues.elements[0].value
-        let pass = loginValues.elements[1].value
+        let user = loginValues.elements[0]
+        let pass = loginValues.elements[1]
 
-         fetch("http://localhost:3000/authorizeUser", {
+         fetch(process.env.AUTHROUTE, {
           method: "POST",
           headers: {
               "Content-Type": "application/json",
               "Authorization": `Basic ${process.env.USERF}:${process.env.PASSWORD}`
           },
           body: JSON.stringify({
-            Email: user,
-            Password: pass
+            Email: user.value,
+            Password: pass.value
           })
         }).then(function(res){
 
           return res.json()
 
         }).then(function(json){
-
             if(json){
               login.hide()
-              webServer.show()
+
+              webServer.addToDocument()
+              //this may present an issue when we try to remove second time
+              webServer.addHandler(true, "logout-button", "click", function(e){
+                 login.show()
+                 webServer.removeFromDocument()
+
+                 user.value = ""
+                 pass.value = ""
+
+               })
+
             }else{
               //for the icon maybe look at browserwindows options for icon and see how
               //that affects pop ups as well as other windows
@@ -58,14 +73,43 @@ login.addHandler(true, "login-button", "click",  function(e){
 
      e.preventDefault();
   });
-login.addHandler(true, "resetPassword", "click", function(e){
-  alert('works')
+login.addHandler(true, "resetPasswordButton", "click", function(e){
+  login.hide()
+  resetPassword.addToDocument()
+  resetPassword.addHandler(true, "reset-button", "click", function(e){
+
+
+  let resetValue = document.getElementById("reset-form")
+  let user = resetValue.elements[0]
+
+  fetch(process.env.RESETPASSROUTE, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Basic ${process.env.USERF}:${process.env.PASSWORD}`
+    },
+    body: JSON.stringify({
+      Email: user.value
+    })
+     }).then(function(res){
+
+       return res.json()
+
+     }).then(function(json){
+
+        resetPassword.removeFromDocument()
+        login.show()
+        console.log(json)
+        user.value = ""
+
+     })
+  })
 });
 login.addHandler(true, "signUp", "click", function(e){
   alert("workds")
 })
-//this could be tedious not being able to add eventListeners until after its added to document
-//do a fetch request to our api to check if authorized
+//why am I able to add a handler on resetPassword even though its not part of the DOM yet
+//but I cant do the same with webserver logout
 
 
 //CHANGES

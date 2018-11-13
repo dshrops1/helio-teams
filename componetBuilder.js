@@ -9,25 +9,14 @@
     this.html = html,
     this.id = id,
     //because add to document is an argument we need a way to add later if false
-    this.build = function(addToDocument,hideToStart=false){
+    //at some point we may want to be able to specify where to append to
+    this.build = function(){
       //if arg is passed as true we create and append to body
-      if(addToDocument){
-
-
         let eleCreated = document.createElement("div");
         eleCreated.setAttribute("id",this.id)
         eleCreated.innerHTML = this.html
-        document.body.appendChild(eleCreated);
+        this.html  = eleCreated;
 
-        if(hideToStart){
-          this.hide();
-        }
-
-        //else we return the html
-      }else{
-
-         return this.html;
-      }
     },
     //using flex box you would need addiotnal css of [hidde]{display: none !important}
     this.hide = function(){
@@ -58,7 +47,28 @@
         //we may want users to be able to do inline styling later on
         //thus we will need to grab that and only remove the display
         document.getElementById(this.id).removeAttribute("style");
+    },
+
+    //need an add to document and a remove to document function
+    this.removeFromDocument = function(){
+
+        let eleToRemove = document.getElementById(this.id)
+        if(eleToRemove === null) return
+        eleToRemove.parentNode.removeChild(eleToRemove);
+
+    },
+
+    this.addToDocument = function(whereToAppend = document.body, hideToStart = false){
+
+          if(hideToStart){
+
+            document.getElementById(this.id).setAttribute("hidden", true);
+          }
+
+          whereToAppend.appendChild(this.html)
     }
+
+
 
 }
 

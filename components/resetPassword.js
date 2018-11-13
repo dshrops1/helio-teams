@@ -6,12 +6,12 @@
 
 let comps = require("../componetBuilder");
 
-let resetPasswordComponent = comps.Builder(
+let resetPasswordComponent = new comps.Builder(
   `
-    <form>
-      <input type="email" required/>
-      <input type="submit"/>
-    </form>
+    <form id="reset-form">
+      <input type="email"/>
+      <input id="reset-button" type="submit"/>
+    </form >
     <p> Please enter your email </p>
 
   `,

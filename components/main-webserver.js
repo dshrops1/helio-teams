@@ -11,7 +11,7 @@ let testComp = new comps.Builder(`
 
 let webServer = new comps.Builder(`
     <p>main-chat-server</p>
-    ${testComp.build()}
+    ${testComp.html}
     <button id="logout-button">logout</button>
 ` , 'main-chat-server');
 

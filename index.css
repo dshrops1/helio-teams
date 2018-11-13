@@ -5,6 +5,11 @@ maybe have a comment above each section for each module ..will decide later
 html, body {
     height: 100%;
     background-color: #3e3e3e;
+
+}
+
+p {
+  color: #ffd007;
 }
 
 a {
@@ -44,4 +49,15 @@ input,button{
 
 #login > * {
   padding: 1em;
+}
+
+#resetPassword {
+
+  height: 100%;
+  /* padding: 0; */
+  /* margin: 0; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }

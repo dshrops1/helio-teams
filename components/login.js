@@ -17,7 +17,7 @@ let loginComponent = new comps.Builder(`
       <input id="login-button" type="submit" />
     </form>
     <section>
-      <button id="resetPassword">reset password</button>
+      <button id="resetPasswordButton">reset password</button>
       <button id="signUp">sign up</button>
     </section>
 
