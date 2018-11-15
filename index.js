@@ -46,6 +46,7 @@ login.addHandler(true, "login-button", "click",  function(e){
           return res.json()
 
         }).then(function(json){
+            
             if(json){
               login.hide()
 

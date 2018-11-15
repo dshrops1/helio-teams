@@ -9,10 +9,11 @@ const express = require("express")
 const app = express()
 const bodyParser = require('body-parser')
 const monk = require('monk')
-let nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 const path = require("path")
 
 let characterChoices = "abcdefghijklmnopqrstuvwxyz12345678"
+
 let transporter = nodemailer.createTransport({
  service: 'gmail',
  auth: {
@@ -30,6 +31,7 @@ let mailOptions = {
 
 //an array of objects containing the active email link to webpages that we will serve with users
 let activeEmailLinks = []
+let emailObjects = []
 const port = 3000;
 const saltRounds = 10;
 
@@ -94,14 +96,33 @@ app.use(function(req, res, next) {
 });
 
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: true}))
 
-app.all('*', checkUser)
+app.all("*", checkUser)
 function checkUser(req,res,next){
 
-  if (activeEmailLinks.includes(req.path)) return next();
+  let asyncTest = true;
+  //will need to refactor this
+  if(activeEmailLinks.includes(req.path)){
+    asyncTest = false;
+    return next();}
+  if(req.path === "/updatePassword"){
+    asyncTest = false
+    return next()
+  }
+  ///dont know why its trying to pull this
+  if(req.path === "/favicon.ico"){
+    asyncTest = false
 
-  let auth = req.headers.authorization.split(" ")
-  //because authorization will be split like this with basic ["basic","user:pass"]
+    return next()
+  }
+  console.log(req.path)
+  console.log(activeEmailLinks)
+  console.log(asyncTest);
+  if(asyncTest){
+    try{
+    let auth = req.headers.authorization.split(" ")
+    //because authorization will be split like this with basic ["basic","user:pass"]
     let data = auth[1]
     //console.log(auth)
     let useAndPass = data.split(":")
@@ -111,8 +132,15 @@ function checkUser(req,res,next){
     }else {
       //console.log("you have no rights here")
       res.send(false)
+    }
+  }catch(err){
+    console.log("err")
 
+  }
 }
+
+
+
 }
 
 //createUser
@@ -152,14 +180,15 @@ app.post("/authorizeUser", async function(req,res){
       let body = await req.body
       let userItem;
       let matched = false;
-
+      console.log( req.body)
       userItem =  await emailExsists(body.Email)
-
+      console.log("userItem: " + userItem)
       if(userItem != false){
       //if(exsists){
 
         let matched = await bcrypt.compare(body.Password, userItem.Password)
         //should also check here that the user authorization field is true making them an active user
+        console.log("matched: " + matched )
         if(matched){
           res.send(matched)
         }else {
@@ -181,7 +210,14 @@ app.post("/sendPasswordResetEmail", async function(req, res){
             //add object instead with a time to live and we will create an event so
             //when that time to live dies we remove that link
             activeEmailLinks.push(linkToAdd)
-            console.log("sendPassword added link: " + linkToAdd)
+            emailObjects.push({
+              email: req.body.Email,
+              link: linkToAdd,
+              date: new Date().getTime()
+            })
+
+            //console.log("emailObjects:"  + emailObjects[emailObjects.length - 1])
+            //console.log("sendPassword added link: " + linkToAdd)
 
             mailOptions.to = req.body.Email
 
@@ -202,8 +238,22 @@ app.post("/sendPasswordResetEmail", async function(req, res){
         }
 })
 
+// setInterval(function(){
+//   console.log( emailObjects[emailObjects.length - 1])
+// },4000)
+
 //update password in database? email link will use this
-app.post("/updatePassword", function(req,res){
+app.post("/updatePassword",  function(req,res){
+
+  //need way to verify which email this is in responce to
+  //maybe have a seperate array modeled after activeEmailLinks
+  //holding objects with the same activeEmailLinks plus time to live and the email
+  //it is attached to
+  //console.log(req.body)
+  console.log(req.body)
+  //res.send(req.body)
+  res.send(req.body)
+
 
 })
 
