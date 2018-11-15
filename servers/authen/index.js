@@ -11,6 +11,7 @@ const bodyParser = require('body-parser')
 const monk = require('monk')
 const nodemailer = require('nodemailer');
 const path = require("path")
+var cors = require('cors')
 
 let characterChoices = "abcdefghijklmnopqrstuvwxyz12345678"
 
@@ -90,13 +91,18 @@ function generateLink(){
 
 }
 //may not need this header but godforbid we have to deal with cors
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    next();
-});
+// app.use(function(req, res, next) {
+//     res.header("Access-Control-Allow-Origin", "*");
+//     next();
+// });
 
-app.use(bodyParser.json({type: "application/json"}))
-app.use(bodyParser.urlencoded({extended: true, type: "application/x-www-form-urlencoded"}))
+//for handling our preflight we might just try to add this to specific route with app.options()
+app.use(cors())
+
+app.use(express.json({type: "application/json"}))
+//app.use(bodyParser())
+//app.use(bodyParser.json({type: "application/json"}))
+//app.use(bodyParser.urlencoded({extended: true, type: "application/x-www-form-urlencoded"}))
 
 app.all("*", checkUser)
 function checkUser(req,res,next){
@@ -243,7 +249,7 @@ app.post("/sendPasswordResetEmail", async function(req, res){
 // },4000)
 
 //update password in database? email link will use this
-app.post("/updatePassword",  function(req,res){
+app.post("/updatePassword", function(req,res){
 
   //need way to verify which email this is in responce to
   //maybe have a seperate array modeled after activeEmailLinks
