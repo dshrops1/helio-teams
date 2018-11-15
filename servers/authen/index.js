@@ -95,8 +95,8 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: true}))
+app.use(bodyParser.json({type: "application/json"}))
+app.use(bodyParser.urlencoded({extended: true, type: "application/x-www-form-urlencoded"}))
 
 app.all("*", checkUser)
 function checkUser(req,res,next){
