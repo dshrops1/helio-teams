@@ -46,15 +46,11 @@ db.then(() => {
 
 const collection = db.get(process.env.COLLECTION);
 
-function encryptPassword(password){
-  bcrypt.genSalt(saltRounds, function(err, salt) {
-    bcrypt.hash(password, salt, function(err, hash) {
-      return hash;
-    });
-});
+function  encryptPassword(password, email){
+
 }
 
- function emailExsists(email){
+function emailExsists(email){
       return  collection.findOne({Email: email}).then(res=>{
 
           if(res !== null){
@@ -90,26 +86,22 @@ function generateLink(){
 }
 
 }
-//may not need this header but godforbid we have to deal with cors
-// app.use(function(req, res, next) {
-//     res.header("Access-Control-Allow-Origin", "*");
-//     next();
-// });
 
 //for handling our preflight we might just try to add this to specific route with app.options()
 app.use(cors())
 
 app.use(express.json({type: "application/json"}))
-//app.use(bodyParser())
-//app.use(bodyParser.json({type: "application/json"}))
-//app.use(bodyParser.urlencoded({extended: true, type: "application/x-www-form-urlencoded"}))
 
 app.all("*", checkUser)
 function checkUser(req,res,next){
 
   let asyncTest = true;
   //will need to refactor this
-  if(activeEmailLinks.includes(req.path)){
+  //console.log("Path that failed: " req.path )
+  //deff not the best way but we will refactor this later as well
+
+  //also maybe add an add statement to check for path
+  if(activeEmailLinks.includes("http://" + process.env.SELFADDRESS + req.path)){
     asyncTest = false;
     return next();}
   if(req.path === "/updatePassword"){
@@ -124,19 +116,22 @@ function checkUser(req,res,next){
   }
   console.log(req.path)
   console.log(activeEmailLinks)
+  console.log("asyncTest")
   console.log(asyncTest);
   if(asyncTest){
     try{
     let auth = req.headers.authorization.split(" ")
+    console.log("AUTH")
+    console.log(auth)
     //because authorization will be split like this with basic ["basic","user:pass"]
     let data = auth[1]
     //console.log(auth)
     let useAndPass = data.split(":")
     if(useAndPass[0] === process.env.USERF && useAndPass[1] === process.env.PASS){
-      //console.log("you have gained access")
+      console.log("you have gained access")
       next();
     }else {
-      //console.log("you have no rights here")
+      console.log("you have no rights here")
       res.send(false)
     }
   }catch(err){
@@ -152,31 +147,33 @@ function checkUser(req,res,next){
 //createUser
 app.post('/createUser', async function(req,res){
 
-    let body = await req.body
+    let body =  req.body
+
+    //hash password will need to return a promise that we wait for
     let objectForDatabase = {
       "Email": body.Email,
-      "Password": body.Password,
-      "Authorized": encryptPassword(body.Authorized),
+      "Password":  body.Password,
+      "Authorized": body.Authorized,
       "Role": body.Role
     }
+
     let properData;
 
-    //for now we will just make sure that values are not undefined and later on we will
-    //update for more advanced checking
     properData =  Object.values(objectForDatabase).reduce(function(accum, curr){
 
             if(curr != undefined){
-              accum = true;
+              return true
             }else{
-              accum = false;
+              return false
             }
-
     })
 
     if(properData){
-      collection.insert(objectForDatabase)
+      await collection.insert(objectForDatabase)
       res.send(true)
-    };
+    }else{
+      res.send(false)
+    }
 })
 
 //route for checking if a users credentials are authroized
@@ -190,7 +187,6 @@ app.post("/authorizeUser", async function(req,res){
       userItem =  await emailExsists(body.Email)
       console.log("userItem: " + userItem)
       if(userItem != false){
-      //if(exsists){
 
         let matched = await bcrypt.compare(body.Password, userItem.Password)
         //should also check here that the user authorization field is true making them an active user
@@ -215,7 +211,8 @@ app.post("/sendPasswordResetEmail", async function(req, res){
             let linkToAdd = generateLink()
             //add object instead with a time to live and we will create an event so
             //when that time to live dies we remove that link
-            activeEmailLinks.push(linkToAdd)
+            //activeEmailLinks.push(linkToAdd)
+            linkToAdd = "http://" + process.env.SELFADDRESS + linkToAdd;
             emailObjects.push({
               email: req.body.Email,
               link: linkToAdd,
@@ -227,7 +224,8 @@ app.post("/sendPasswordResetEmail", async function(req, res){
 
             mailOptions.to = req.body.Email
 
-            mailOptions.text = process.env.SELFADDRESS + linkToAdd
+            mailOptions.text = linkToAdd
+            activeEmailLinks.push(linkToAdd)
             //console.log(mailOptions)
             //send email
             transporter.sendMail(mailOptions, function (err, info) {
@@ -251,14 +249,32 @@ app.post("/sendPasswordResetEmail", async function(req, res){
 //update password in database? email link will use this
 app.post("/updatePassword", function(req,res){
 
-  //need way to verify which email this is in responce to
-  //maybe have a seperate array modeled after activeEmailLinks
-  //holding objects with the same activeEmailLinks plus time to live and the email
-  //it is attached to
-  //console.log(req.body)
-  console.log(req.body)
+  console.log("this came from: " + req.body.href)
   //res.send(req.body)
-  res.send(req.body)
+  //maybe send a sucess html file
+  let isActiveEmailReset = activeEmailLinks.indexOf(req.body.href)
+  if(isActiveEmailReset > -1){
+    let properEmail
+    emailObjects.forEach((obj,index) => {
+
+       if(obj.link === activeEmailLinks[index]) properEmail = obj.email
+       })
+
+    //use properEmail to find object in database and update password with
+    //req password if they are equal to confirm
+    if(req.pass === req.confirm){
+
+      //need to update full object in database
+      collection.update({Email: properEmail}, {Password: encryptPassword(req.password)})
+    }
+
+
+    res.send(true)
+  }else {
+    res.send(false)
+  }
+
+
 
 
 })
