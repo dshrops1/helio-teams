@@ -46,8 +46,19 @@ db.then(() => {
 
 const collection = db.get(process.env.COLLECTION);
 
-function  encryptPassword(password, email){
+function  encryptPassword(password){
 
+    return new Promise(function(res, rej){
+
+      setTimeout(function(){
+        bcrypt.genSalt(saltRounds, function(err, salt) {
+          bcrypt.hash(password, salt, function(err, hash) {
+            if(err) rej(err)
+            res(hash)
+    });
+});
+      },300)
+    })
 }
 
 function emailExsists(email){
@@ -152,7 +163,7 @@ app.post('/createUser', async function(req,res){
     //hash password will need to return a promise that we wait for
     let objectForDatabase = {
       "Email": body.Email,
-      "Password":  body.Password,
+      "Password": await encryptPassword(body.Password),
       "Authorized": body.Authorized,
       "Role": body.Role
     }
@@ -242,16 +253,14 @@ app.post("/sendPasswordResetEmail", async function(req, res){
         }
 })
 
-// setInterval(function(){
-//   console.log( emailObjects[emailObjects.length - 1])
-// },4000)
+
 
 //update password in database? email link will use this
 app.post("/updatePassword", function(req,res){
-
-  console.log("this came from: " + req.body.href)
-  //res.send(req.body)
+  let binder = this
   //maybe send a sucess html file
+  let newPassword = req.body.pass
+
   let isActiveEmailReset = activeEmailLinks.indexOf(req.body.href)
   if(isActiveEmailReset > -1){
     let properEmail
@@ -262,10 +271,20 @@ app.post("/updatePassword", function(req,res){
 
     //use properEmail to find object in database and update password with
     //req password if they are equal to confirm
-    if(req.pass === req.confirm){
-
+    if(req.body.pass === req.body.confirm){
       //need to update full object in database
-      collection.update({Email: properEmail}, {Password: encryptPassword(req.password)})
+      //grab document and use that to update
+      collection.findOne({Email: properEmail}).then(async function(doc){
+          console.log("passpass: " + newPassword)
+        collection.update({Email: properEmail}, {
+          Email: doc.Email,
+          Password: await encryptPassword(newPassword),
+          Authorized: doc.Authorized,
+          Role: doc.Role
+        })
+
+      }).bind({pass: newPassword}))
+
     }
 
 
