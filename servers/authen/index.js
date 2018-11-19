@@ -125,8 +125,12 @@ function checkUser(req,res,next){
 
     return next()
   }
-  console.log(req.path)
-  console.log(activeEmailLinks)
+  if(req.path === "/success"){
+    asyncTest = false
+    return next()
+  }
+  //console.log(req.path)
+  //console.log(activeEmailLinks)
   console.log("asyncTest")
   console.log(asyncTest);
   if(asyncTest){
@@ -147,6 +151,7 @@ function checkUser(req,res,next){
     }
   }catch(err){
     console.log("err")
+    console.log(req.path)
 
   }
 }
@@ -256,6 +261,7 @@ app.post("/sendPasswordResetEmail", async function(req, res){
 
 
 //update password in database? email link will use this
+//update this for routes and all other functions
 app.post("/updatePassword", function(req,res){
   let binder = this
   //maybe send a sucess html file
@@ -274,22 +280,26 @@ app.post("/updatePassword", function(req,res){
     if(req.body.pass === req.body.confirm){
       //need to update full object in database
       //grab document and use that to update
+      //change to arrow this.
       collection.findOne({Email: properEmail}).then(async function(doc){
-          console.log("passpass: " + newPassword)
+          console.log("passpass: " + this.pass)
         collection.update({Email: properEmail}, {
           Email: doc.Email,
-          Password: await encryptPassword(newPassword),
+          Password: await encryptPassword(this.pass),
           Authorized: doc.Authorized,
           Role: doc.Role
         })
 
-      }).bind({pass: newPassword}))
-
+      }.bind({pass: newPassword}))
+      //I dont like how we had to bind for this
     }
 
 
-    res.send(true)
+    //need to delete objects that have been used
+
+    res.send("/success")
   }else {
+    //send a failer filer
     res.send(false)
   }
 
@@ -298,10 +308,20 @@ app.post("/updatePassword", function(req,res){
 
 })
 
+app.get("/success", function(req,res){
+  res.sendFile(path.join(__dirname + "/expressFiles/sucess.html"))
+})
+
 app.get(activeEmailLinks, function(req,res){
   res.sendFile(path.join(__dirname + "/expressFiles/resetPassword.html"))
 })
 
-//user exsists route for reseting password
+
+
+//change authorization route for updating database with authorized : true
+//will check who is trying to update and see what their role is
+
+//route for getting all Authorized: false
+//so admin on front end can just change with a click of a button
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
