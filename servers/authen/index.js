@@ -1,6 +1,6 @@
 /*
 * Authors: Dustin shrosphire
-* Notes:
+* Notes: Currently sends and email to emails that arnt registed.
 */
 
 require('dotenv').config();
@@ -65,6 +65,7 @@ function emailExsists(email){
       return  collection.findOne({Email: email}).then(res=>{
 
           if(res !== null){
+            console.log(res)
             return res;
           }else{
             return false;
@@ -281,17 +282,15 @@ app.post("/updatePassword", function(req,res){
       //need to update full object in database
       //grab document and use that to update
       //change to arrow this.
-      collection.findOne({Email: properEmail}).then(async function(doc){
-          console.log("passpass: " + this.pass)
+      collection.findOne({Email: properEmail}).then(async doc=>{
         collection.update({Email: properEmail}, {
           Email: doc.Email,
-          Password: await encryptPassword(this.pass),
+          Password: await encryptPassword(newPassword),
           Authorized: doc.Authorized,
           Role: doc.Role
         })
 
-      }.bind({pass: newPassword}))
-      //I dont like how we had to bind for this
+      })
     }
 
 
@@ -310,6 +309,10 @@ app.post("/updatePassword", function(req,res){
 
 app.get("/success", function(req,res){
   res.sendFile(path.join(__dirname + "/expressFiles/sucess.html"))
+})
+
+app.get("/failure", (req,res) => {
+  res.sendFile (__dirname + "/expressFiles/failure.html")
 })
 
 app.get(activeEmailLinks, function(req,res){
