@@ -4,6 +4,7 @@
 */
 
 let comps = require("../componetBuilder");
+let chat = require("./chatComponent").chatComponent
 
 let testComp = new comps.Builder(`
     <p>testing</p>
@@ -11,9 +12,8 @@ let testComp = new comps.Builder(`
 
 let webServer = new comps.Builder(`
     <p>main-chat-server</p>
-    ${testComp.html}
+    ${chat.html}
     <button id="logout-button">logout</button>
-    <button id="test-socket">test socket</button>
 ` , 'main-chat-server');
 
 ;

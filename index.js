@@ -51,22 +51,23 @@ login.addHandler(true, "login-button", "click",  function(e){
 
             if(json){
               login.hide()
+              
               webServer.addToDocument()
 
               socket = io(process.env.SOCKETCONNECTION)
               socket.on("connect", function(){
                 console.log("we are connected")
+              })
 
-                webServer.addHandler(true, "test-socket","click", function(e){
-                  console.log("sending event")
-                  socket.emit("test")
-                })
+              socket.on("disconnect", function(){
+                console.log("disconnecting")
+                socket = null
+              })
 
-                socket.on("disconnect", function(){
-                  console.log("disconnecting")
-                  socket = null
-                })
-
+              socket.on("broadcast", function(msg){
+                let newPTag = document.createElement("P")
+                newPTag.appendChild(document.createTextNode(msg))
+                document.getElementById("chat-div").appendChild(newPTag)
               })
 
               //this may present an issue when we try to remove second time
@@ -79,9 +80,10 @@ login.addHandler(true, "login-button", "click",  function(e){
 
                })
 
-
-
-
+              webServer.addHandler(true,"chat-form", "submit", function(e){
+                e.preventDefault()
+                socket.emit("message", e.target[0].value)
+              })
 
 
             }else{

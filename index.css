@@ -61,3 +61,14 @@ input,button{
   align-items: center;
   justify-content: center;
 }
+
+#chat-div{
+  height:200px;
+  width:90%;
+  background-color: white;
+}
+#chat-div{overflow:hidden; overflow-y:scroll;}
+
+#chat-div > p {
+  padding-left: 10px;
+}
