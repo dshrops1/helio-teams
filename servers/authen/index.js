@@ -68,6 +68,7 @@ function emailExsists(email){
             console.log(res)
             return res;
           }else{
+            console.log(res)
             return false;
           }
 
@@ -96,10 +97,8 @@ function generateLink(){
   function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
-
 }
 
-//for handling our preflight we might just try to add this to specific route with app.options()
 app.use(cors())
 
 app.use(express.json({type: "application/json"}))
@@ -247,10 +246,8 @@ app.post("/sendPasswordResetEmail", async function(req, res){
             //send email
             transporter.sendMail(mailOptions, function (err, info) {
               if(err){
-              //console.log(err)
               res.send(false)
             }else{
-              //console.log(info);
               res.send(true)
             }
             });
@@ -264,12 +261,13 @@ app.post("/sendPasswordResetEmail", async function(req, res){
 //update password in database? email link will use this
 //update this for routes and all other functions
 app.post("/updatePassword", function(req,res){
-  let binder = this
-  //maybe send a sucess html file
+
   let newPassword = req.body.pass
 
   let isActiveEmailReset = activeEmailLinks.indexOf(req.body.href)
+
   if(isActiveEmailReset > -1){
+
     let properEmail
     emailObjects.forEach((obj,index) => {
 
@@ -279,27 +277,21 @@ app.post("/updatePassword", function(req,res){
     //use properEmail to find object in database and update password with
     //req password if they are equal to confirm
     if(req.body.pass === req.body.confirm){
-      //need to update full object in database
-      //grab document and use that to update
-      //change to arrow this.
-      collection.findOne({Email: properEmail}).then(async doc=>{
+      collection.findOne({Email: properEmail})
+      .then(async doc=>{
         collection.update({Email: properEmail}, {
           Email: doc.Email,
           Password: await encryptPassword(newPassword),
           Authorized: doc.Authorized,
           Role: doc.Role
         })
-
       })
     }
 
 
-    //need to delete objects that have been used
-
     res.send("/success")
   }else {
-    //send a failer filer
-    res.send(false)
+    res.send("/failure")
   }
 
 

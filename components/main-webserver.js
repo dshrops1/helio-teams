@@ -13,6 +13,7 @@ let webServer = new comps.Builder(`
     <p>main-chat-server</p>
     ${testComp.html}
     <button id="logout-button">logout</button>
+    <button id="test-socket">test socket</button>
 ` , 'main-chat-server');
 
 ;

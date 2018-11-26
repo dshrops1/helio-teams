@@ -2,6 +2,7 @@ let comps = require("./componetBuilder");
 let login = require("./components/login.js").login
 let webServer = require("./components/main-webserver.js").webServer
 let resetPassword = require("./components/resetPassword.js").resetPassword;
+const io = require("socket.io-client")
 
 require('dotenv').config()
 
@@ -9,6 +10,7 @@ const {dialog} = require('electron').remote
 const dialogOptions = {type: 'info', buttons: ['OK', 'Cancel'], message: 'YOU SHALL NOT PASS!...without the right credentials.?'}
 //dialog.showMessageBox(dialogOptions, i => console.log(i))
 
+let socket;
 /*
 * Build out your compoents with componetBuilder
 * bring them into an index.js to modify them and update so all other logic is done here
@@ -46,11 +48,27 @@ login.addHandler(true, "login-button", "click",  function(e){
           return res.json()
 
         }).then(function(json){
-            
+
             if(json){
               login.hide()
-
               webServer.addToDocument()
+
+              socket = io(process.env.SOCKETCONNECTION)
+              socket.on("connect", function(){
+                console.log("we are connected")
+
+                webServer.addHandler(true, "test-socket","click", function(e){
+                  console.log("sending event")
+                  socket.emit("test")
+                })
+
+                socket.on("disconnect", function(){
+                  console.log("disconnecting")
+                  socket = null
+                })
+
+              })
+
               //this may present an issue when we try to remove second time
               webServer.addHandler(true, "logout-button", "click", function(e){
                  login.show()
@@ -60,6 +78,11 @@ login.addHandler(true, "login-button", "click",  function(e){
                  pass.value = ""
 
                })
+
+
+
+
+
 
             }else{
               //for the icon maybe look at browserwindows options for icon and see how
